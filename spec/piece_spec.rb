@@ -13,7 +13,7 @@ describe Piece do
   end
 
   it 'parses a Knight' do
-    piece = Piece.parse 'K111'
+    piece = Piece.parse 'N111'
     piece.should be_a Knight
   end
 

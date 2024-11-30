@@ -15,6 +15,6 @@ describe 'Game' do
     game.move_piece from: [2, 2], to: [3, 3]
     game.move_piece from: [2, 2], to: [3, 3]
 
-    p game
+    # p game
   end
 end
