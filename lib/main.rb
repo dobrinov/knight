@@ -1,4 +1,3 @@
-require_relative 'path_finder'
 require_relative 'block'
 require_relative 'board'
 require_relative 'map'
