@@ -1,3 +1,4 @@
+require_relative 'resource'
 require_relative 'block'
 require_relative 'board'
 require_relative 'map'

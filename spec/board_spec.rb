@@ -43,6 +43,6 @@ describe Board do
     piece.attack.should eq 1
     piece.defense.should eq 2
     piece.health.should eq 3
-    resource.should eq :gold
+    resource.should eq Resource::GOLD
   end
 end
