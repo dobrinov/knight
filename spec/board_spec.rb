@@ -23,7 +23,7 @@ describe Board do
     block = board[0][0]
 
     block.should be_a Block
-    block.player.should be_nil
+    block.player_id.should be_nil
     block.piece.should be_nil
   end
 
@@ -38,7 +38,7 @@ describe Board do
     piece = block.piece
     resource = block.resource
 
-    block.player.should eq 1
+    block.player_id.should eq 1
     piece.should be_a Pawn
     piece.attack.should eq 1
     piece.defense.should eq 2

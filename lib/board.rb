@@ -17,16 +17,20 @@ class Board
     @state = state
   end
 
-  def move_piece(from, to, piece, player)
-    raise "Invalid move" unless within?(*to)
-    remove_piece *from
-    place_piece to[0], to[1], piece, player
+  def owned_blocks
+    @state.flatten.filter { _1.owned? }
   end
 
-  def place_piece(x, y, piece, player)
+  def move_piece(from, to, piece, player_id)
+    raise "Invalid move" unless within?(*to)
+    remove_piece *from
+    place_piece to[0], to[1], piece, player_id
+  end
+
+  def place_piece(x, y, piece, player_id)
     raise "Invalid position" unless within?(x, y)
     raise "[#{x}, #{y}] is occupied by another piece" unless @state[x][y].piece.nil?
-    @state[x][y].player = player
+    @state[x][y].player_id = player_id
     @state[x][y].piece = piece
   end
 

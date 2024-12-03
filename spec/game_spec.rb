@@ -11,18 +11,16 @@ describe 'Game' do
         ---X
       MAP
 
-    game = Game.new map:, min_players: 2, max_players: 2
-
-    player_one = game.add_player 'Victor'
-    player_two = game.add_player 'Alexander'
-
-    game.start
+    lobby = Lobby.new map: Map.parse(map)
+    victor = lobby.add_player 'Victor'
+    alexander = lobby.add_player 'Alexander'
+    game = lobby.start_game
 
     game.move_piece from: [0, 0], to: [1, 1]
     game.move_piece from: [1, 1], to: [2, 2]
     game.move_piece from: [2, 2], to: [3, 3]
 
-    p game
+    # p game
   end
 
   describe 'ending turns' do
@@ -33,12 +31,11 @@ describe 'Game' do
           -X
         MAP
 
-      game = Game.new map:, min_players: 2, max_players: 2
+      lobby = Lobby.new map: Map.parse(map)
+      victor = lobby.add_player 'Victor'
+      alexander = lobby.add_player 'Alexander'
+      game = lobby.start_game
 
-      victor = game.add_player 'Victor'
-      alexander = game.add_player 'Alexander'
-
-      game.start
       game.current_player.should eq victor
       game.end_turn
       game.current_player.should eq alexander
@@ -46,7 +43,30 @@ describe 'Game' do
       game.current_player.should eq victor
     end
 
-    it 'distributes resources from occupied blocks'
+    it 'distributes resources from occupied blocks' do
+      board =
+        <<~BOARD
+          -0K101 W0---- I1----
+          W0---- G0---- S1----
+          ------ W1---- -1K101
+        BOARD
+
+      victor = Player.new id: 0, name: 'Victor', wood: 0, stone: 0, iron: 0, gold: 0
+      alexander = Player.new id: 1, name: 'Alexander', wood: 0, stone: 0, iron: 0, gold: 0
+
+      game = Game.new board: Board.parse(board), players: [victor, alexander]
+
+      game.end_turn
+
+      victor.wood.should eq 2
+      victor.stone.should eq 0
+      victor.iron.should eq 0
+      victor.gold.should eq 1
+
+      alexander.wood.should eq 1
+      alexander.stone.should eq 1
+      alexander.iron.should eq 1
+      alexander.gold.should eq 0
     end
   end
 end

@@ -20,6 +20,10 @@ class Map
     @state = state
   end
 
+  def max_players
+    @state.flatten.count 'X'
+  end
+
   def height
     @state.size
   end
@@ -35,11 +39,11 @@ class Map
       @state.each_with_index.map do |row, x|
         row.each_with_index.map do |block, y|
           if block == 'X' && placed_players < players_to_place
-            player = placed_players
+            player_id = placed_players
             placed_players += 1
             piece = King.new
 
-            Block.new x:, y:, player:, piece:
+            Block.new x:, y:, player_id:, piece:
           elsif block == '-'
             Block.new x:, y:
           else

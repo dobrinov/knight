@@ -1,5 +1,6 @@
 require_relative 'resource'
-require_relative 'turn'
+require_relative 'player'
+require_relative 'lobby'
 require_relative 'block'
 require_relative 'board'
 require_relative 'map'
