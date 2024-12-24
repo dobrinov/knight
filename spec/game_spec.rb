@@ -23,6 +23,20 @@ describe 'Game' do
     # p game
   end
 
+  describe 'battle' do
+  end
+
+  describe 'movement' do
+    it 'moves' do
+    end
+
+    it 'does not allow move if not player turn' do
+    end
+
+    it 'does not allow move if already done this turn' do
+    end
+  end
+
   describe 'ending turns' do
     it 'switches between players' do
       map =
