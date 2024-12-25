@@ -1,0 +1,46 @@
+{
+  "editor.tabSize": 2,
+  "editor.rulers": [120],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll.stylelint": "always"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/log": true
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[javascriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
+  "stylelint.validate": ["css", "scss"],
+  "css.validate": false,
+  "scss.validate": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

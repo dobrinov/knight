@@ -20,6 +20,15 @@ post '/api/guests' do
   end
 end
 
+get '/api/lobby' do
+  result =
+    DB.with do |psql|
+      psql.exec('SELECT * FROM games WHERE started_at IS NULL')
+    end
+
+  result.values.to_json
+end
+
 post '/api/games' do
   map =
     <<~MAP
