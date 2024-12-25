@@ -1,0 +1,18 @@
+require_relative 'database'
+
+namespace :db  do
+  task :create do
+    Database.create
+    Database.migrate
+  end
+
+  task :drop do
+    Database.drop
+  end
+
+  task :reset do
+    Database.drop
+    Database.create
+    Database.migrate
+  end
+end

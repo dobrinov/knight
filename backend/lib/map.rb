@@ -56,4 +56,8 @@ class Map
 
     Board.new blocks
   end
+
+  def to_s
+    @state.map { _1.join '' }.join "\n"
+  end
 end
