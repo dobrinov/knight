@@ -1,9 +1,14 @@
 require_relative 'database'
+require_relative 'seed'
 
 namespace :db  do
   task :create do
     Database.create
     Database.migrate
+  end
+
+  task :seed do
+    Seed.execute
   end
 
   task :drop do
@@ -14,5 +19,6 @@ namespace :db  do
     Database.drop
     Database.create
     Database.migrate
+    Seed.execute
   end
 end

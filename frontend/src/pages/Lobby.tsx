@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 export function Lobby() {
   const { isPending, error, data } = useQuery({
-    queryKey: ["repoData"],
+    queryKey: ["lobby"],
     queryFn: () =>
       fetch("http://localhost:4567/api/lobby").then((res) => res.json()),
   });

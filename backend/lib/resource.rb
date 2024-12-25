@@ -1,5 +1,5 @@
 module Resource
-  extend self
+  module_function
 
   ALL = [
     WOOD = 'W',
@@ -10,6 +10,7 @@ module Resource
 
   def valid?(value)
     return true if value.nil?
+
     ALL.include? value
   end
 

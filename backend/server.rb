@@ -17,10 +17,12 @@ post '/api/guests' do
   request.body.rewind
   body = JSON.parse request.body.read
 
-  # Create guest user and return JWT token
   DB.with do |psql|
-    psql.exec_params('INSERT INTO users (name, guest) VALUES ($1, $2) RETURNING *', [params['name'], true])
+    psql.exec_params('INSERT INTO users (name, guest) VALUES ($1, $2) RETURNING *', [body['name'], true])
   end
+
+  # Create guest user and return JWT token
+  'thisshouldbeaJWToken'
 end
 
 get '/api/lobby' do

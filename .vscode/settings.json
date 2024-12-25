@@ -38,6 +38,10 @@
     "typescript",
     "typescriptreact"
   ],
+  "[ruby]": {
+    "editor.defaultFormatter": "rubocop.vscode-rubocop",
+    "editor.formatOnSave": true
+  },
   "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
   "stylelint.validate": ["css", "scss"],
   "css.validate": false,

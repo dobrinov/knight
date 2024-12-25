@@ -2,9 +2,9 @@ require 'pg'
 require 'connection_pool'
 
 module Database
-  extend self
+  module_function
 
-  NAME = 'knight'
+  NAME = 'knight'.freeze
 
   def connection_pool
     ConnectionPool.new(size: 5, timeout: 5) { connect }
