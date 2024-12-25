@@ -1,6 +1,19 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 
 export function Lobby() {
+  const { isPending, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () =>
+      fetch("http://localhost:4567/api/lobby").then((res) => res.json()),
+  });
+
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
+
+  console.log(data);
+
   return (
     <div>
       <strong>Lobby</strong>

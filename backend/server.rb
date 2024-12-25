@@ -4,7 +4,10 @@ require_relative './lib/main'
 
 DB = Database.connection_pool
 
-set :json_content_type, :js
+before do
+  content_type :json
+  headers 'Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Methods' => %w[OPTIONS GET POST]
+end
 
 post '/api/users' do
   # Create a user
