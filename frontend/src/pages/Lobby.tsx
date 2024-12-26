@@ -2,7 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 
 export function Lobby() {
-  const { isPending, error, data } = useQuery({
+  const {
+    isPending,
+    error,
+    data: lobbies,
+  } = useQuery({
     queryKey: ["lobby"],
     queryFn: () =>
       fetch("http://localhost:4567/api/lobby").then((res) => res.json()),
@@ -11,8 +15,6 @@ export function Lobby() {
   if (isPending) return "Loading...";
 
   if (error) return "An error has occurred: " + error.message;
-
-  console.log(data);
 
   return (
     <div>
@@ -24,17 +26,23 @@ export function Lobby() {
           <tr>
             <th>Name</th>
             <th>Players</th>
+            <th>Map</th>
             <th>&nbsp;</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Hello world</td>
-            <td>2/4</td>
-            <td>
-              <button type="button">Join</button>
-            </td>
-          </tr>
+          {lobbies.map((lobby: any) => (
+            <tr key={lobby.id}>
+              <td>Hello world</td>
+              <td>
+                {lobby.players.length}/{lobby.max_players}
+              </td>
+              <td>{lobby.map}</td>
+              <td>
+                <button type="button">Join</button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

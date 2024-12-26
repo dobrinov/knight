@@ -2,16 +2,22 @@ require 'pg'
 require 'connection_pool'
 
 module Database
-  module_function
-
   NAME = 'knight'.freeze
 
-  def connection_pool
-    ConnectionPool.new(size: 5, timeout: 5) { connect }
+  module_function
+
+  def exec(query)
+    connection_pool.with do |psql|
+      psql.type_map_for_results = PG::BasicTypeMapForResults.new psql
+      psql.exec(query).entries
+    end
   end
 
-  def connect
-    PG::Connection.new dbname: NAME, user: 'root'
+  def exec_params(query, params)
+    connection_pool.with do |psql|
+      psql.type_map_for_results = PG::BasicTypeMapForResults.new psql
+      psql.exec_params(query, params).entries
+    end
   end
 
   def create
@@ -56,5 +62,13 @@ module Database
     SQL
 
     db.close
+  end
+
+  def connection_pool
+    @connection_pool ||= ConnectionPool.new(size: 5, timeout: 5) { connect }
+  end
+
+  def connect
+    PG::Connection.new dbname: NAME, user: 'root'
   end
 end
