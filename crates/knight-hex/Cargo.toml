@@ -1,0 +1,7 @@
+[package]
+name = "knight-hex"
+description = "Hexagon grid math for Knight Engine: coordinates, layouts, maps, pathfinding, visibility and noise."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

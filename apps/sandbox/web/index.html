@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Knight Engine Sandbox</title>
+  <link rel="icon" href="data:,">
+  <style>
+    html, body { margin: 0; height: 100%; background: #0e0f16; overflow: hidden; }
+    canvas#knight { display: block; width: 100vw; height: 100vh; outline: none; touch-action: none; }
+    #loading { position: fixed; inset: 0; display: grid; place-items: center; color: #c8a45c;
+      font: 16px ui-monospace, Menlo, monospace; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <canvas id="knight" tabindex="0"></canvas>
+  <div id="loading">Loading Knight Engine...</div>
+  <script type="module">
+    import init from "./pkg/sandbox.js";
+    // `?backend=webgl2` hides WebGPU so the WebGL2 fallback can be tested in any browser.
+    if (new URLSearchParams(location.search).get("backend") === "webgl2") {
+      Object.defineProperty(navigator, "gpu", { value: undefined, configurable: true });
+    }
+    const canvas = document.getElementById("knight");
+    const observer = new MutationObserver(() => {
+      if (canvas.dataset.status) { document.getElementById("loading")?.remove(); observer.disconnect(); }
+    });
+    observer.observe(canvas, { attributes: true });
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+    canvas.addEventListener("pointerdown", () => canvas.focus());
+    init().catch((e) => {
+      // winit uses an exception to hand control to the browser's event loop; that one is fine.
+      if (!String(e).includes("Using exceptions for control flow")) {
+        document.getElementById("loading").textContent = "Failed to start: " + e;
+        console.error(e);
+      }
+    });
+  </script>
+</body>
+</html>

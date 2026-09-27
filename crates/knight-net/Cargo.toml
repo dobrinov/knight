@@ -1,0 +1,16 @@
+[package]
+name = "knight-net"
+description = "Knight Engine networking: binary codec, transports (in-process, WebSocket on web and native), relay protocol and lockstep sessions."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+log.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tungstenite = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen.workspace = true
+js-sys = { workspace = true }
+web-sys = { workspace = true, features = ["WebSocket", "MessageEvent", "BinaryType", "ErrorEvent", "CloseEvent"] }

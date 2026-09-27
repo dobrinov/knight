@@ -1,0 +1,8 @@
+[package]
+name = "knight-assets"
+description = "Knight Engine asset pack: pixel-art terrain, props, fire, and humans / orcs / elves units, heroes, monsters and buildings."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+knight-core.workspace = true

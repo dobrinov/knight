@@ -1,0 +1,13 @@
+[package]
+name = "knight-core"
+description = "Renderer-independent core of Knight Engine: hex worlds, cameras, picking, meshing, input, UI and scenes."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+knight-hex.workspace = true
+glam.workspace = true
+bytemuck.workspace = true
+png.workspace = true
+font8x8.workspace = true
+log.workspace = true

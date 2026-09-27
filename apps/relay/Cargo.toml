@@ -1,0 +1,14 @@
+[package]
+name = "knight-relay"
+description = "Knight Engine relay server: WebSocket rooms that forward payloads between game clients (web and native)."
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+knight-net.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+futures-util.workspace = true
+log.workspace = true
+env_logger.workspace = true

@@ -1,0 +1,14 @@
+[package]
+name = "knight-sandbox"
+description = "Knight Engine sandbox: interactive demos of every engine feature and several genre prototypes."
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[[bin]]
+name = "sandbox"
+path = "src/main.rs"
+
+[dependencies]
+knight-engine.workspace = true
+knight-assets.workspace = true
