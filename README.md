@@ -1,93 +1,91 @@
 # Knight Engine
 
-A hex-based, isometric 2.5D game engine in Rust for strategy and RPG games: Heroes-style
-adventure maps, Diablo-style RPGs, Warcraft-style squad strategy, Railroad-Tycoon-style builders.
-Built on **wgpu** and **winit**, so one codebase runs on the web (WebGPU, falling back to WebGL2),
-Windows, macOS, Linux, iOS and Android. Hex math follows
-[Red Blob Games' hexagon guide](https://www.redblobgames.com/grids/hexagons/).
+**A hex-based, isometric 2.5D game engine in Rust — for strategy and RPG games that run on the
+web, the desktop and mobile from one codebase.**
+
+Heroes-style adventure maps, Diablo-style RPGs, Warcraft-style squad battles, Railroad
+Tycoon-style builders: Knight gives you the hex grid, the terrain, the camera, the renderer and the
+game-loop plumbing, so you can spend your time on the game. It is built on
+[wgpu](https://wgpu.rs) and [winit](https://github.com/rust-windowing/winit), renders with WebGPU
+(falling back to WebGL2 in older browsers), and follows
+[Red Blob Games' hexagon guide](https://www.redblobgames.com/grids/hexagons/) for all grid math.
+
+![The sandbox menu over a procedurally generated island](docs/images/menu.png)
+
+<table>
+  <tr>
+    <td><img src="docs/images/adventure-map.png" alt="An adventure map with a castle, heroes and resources"></td>
+    <td><img src="docs/images/squads.png" alt="Turn-based squads next to a castle, with a minimap"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Adventure map → town → battle, as a scene stack</sub></td>
+    <td align="center"><sub>Turn-based squads with fog of war and a minimap</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/stress-pixel-art.png" alt="2,000 units pathing across a large map in pixel-art mode"></td>
+    <td><img src="docs/images/chat.png" alt="A crowded town square with chat bubbles and emotes"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>2,000 units walking hex to hex, pixel-art mode, 60 fps in the browser</sub></td>
+    <td align="center"><sub>Chat bubbles and emotes that stay readable in a crowd</sub></td>
+  </tr>
+</table>
+
+## Why Knight
+
+- **Hexes all the way down.** Everything that moves goes hex to hex through one navigation type,
+  so turn-based, real-time and hybrid games share pathfinding, occupancy and terrain costs.
+- **Huge maps are cheap.** Terrain is meshed lazily, only for the chunks on screen, and evicted
+  when unused. A four-million-hex map loads in about 150 ms and uses tens of megabytes.
+- **Pixel-perfect or smooth, your choice.** A pixel-art mode renders at low resolution with
+  nearest upscaling, pixel snapping and pixel-perfect zoom. A hi-res mode uses linear filtering
+  and 4× MSAA. The UI stays crisp on high-DPI screens either way.
+- **Batteries included, no asset pipeline required.** A bundled pixel-art pack (terrain, props,
+  45 characters, 38 buildings, team colours), synthesized sound effects and chiptune music, and
+  a built-in font mean a game can run with zero external files.
+- **Runs everywhere wgpu does.** The same game builds for the browser, Windows, macOS and Linux,
+  with gamepads, touch and audio handled for you.
 
 ## Features
 
-- **Hex grids:** axial/cube/offset/doubled coordinates, pointy and flat layouts, rings, spirals,
-  lines, rotation and reflection, and map shapes (hexagon, rectangle, rhombus, triangle).
-- **Terrain:** per-hex height levels (hills and depressions), a water plane with visible
-  submerged ground, textured materials, stacked cliff walls and a bevel shading grid.
-- **Isometric camera:** pan (drag, keys, or pushing the pointer against the screen edge), zoom at the cursor, and a configurable viewing angle (from 30° to
-  top-down). The camera orientation is fixed (no rotation). Controls cover mouse drag, wheel,
-  keyboard, screen-edge scrolling, pinch and two-finger pan.
-- **Rendering:** chunked terrain meshes, built only for the chunks in view. Meshing is spread
-  over frames, and chunks that go unused are evicted, so a million-hex map loads in a fraction
-  of a second and uses about as much memory as a small one. Sprites are depth-correct and upright,
-  with shadows. Overlays (fills, outlines, paths, rings, decals) can be drawn on top of
-  everything. Also: world-anchored labels and bars, several cameras per frame, gradient
-  backdrops, and a `Minimap` image (one pixel per hex, any map size, re-rendered only on change).
-- **Asset pack (`knight-assets`):** bundled pixel art, loaded on demand.
-  - 19 terrains (seamless tops and cliffs; water and lava animate) and 10 prop sheets (trees,
-    rocks, bushes, mountains), plus fire, smoke and burn decals.
-  - 45 characters: humans, orcs and elves units and heroes, and monsters. Each has idle, walk,
-    attack, hurt and death, plus a second attack, shot, cast or work animation.
-  - 38 buildings, each with an idle animation plus construction, damaged and ruined states.
-  - Everything is recoloured to any team colour.
-  - The atlas grows extra 2048² pages as needed. Animated images update in place.
-- **Pixel art and hi-res:** a pixel-art mode (low-res target, nearest upscale, pixel snapping,
-  pixel-perfect zoom levels) or a hi-res mode (linear filtering, 4× MSAA). The UI stays crisp on
-  high-DPI screens.
-- **Picking:** elevation-aware. Rays hit tile tops and walls, so tall hexes correctly hide the
-  ones behind them.
-- **Hex navigation:** `HexMover` is the only way to move. It walks routes of adjacent hexes, never
-  stops between hexes, and walks at the speed the terrain allows (roads fast, forests and snow
-  slow, climbing slower). `Reservations` let real-time units queue instead of overlapping. The
-  same terrain costs become movement points in turn-based games.
-- **Closing-in hazards:** `ShrinkingZone` is a phased safe circle that closes toward random
-  points (the next circle is known in advance) with damage outside it. `Wildfire` is fire that
-  spreads by terrain flammability and burns out to ash. Together they give battle royale, "the
-  map shrinks" or storm modes, in turn-based (ticks = turns) or real-time (ticks = seconds) games.
-- **Hybrid turns:** `DayClock` and `ActionBudget` give timed days instead of "End turn": everyone
-  acts at the same time in real time, each with a daily budget of movement points and actions,
-  and the day ends when its timer runs out or everyone is ready (like simultaneous turns).
-- **Multiplayer chat:** chat bubbles and emotes that stay readable in crowds (a budget of visible
-  bubbles ranked by priority, "..." markers for the rest, no overlaps, repeats collapsed, and
-  identical emotes merged with a count), plus a chat log and a text field widget.
-- **Light and FX:** per-camera ambient light for day/night and weather, particles (sparks,
-  smoke, fire), territory borders and hex-edge lines for rivers and walls.
-- **Gameplay helpers:** A* with arbitrary step costs, movement ranges within a budget, flow
-  fields for crowds, height-aware line of sight and field of view, fog of war
-  (hidden/explored/visible), a seeded RNG and value noise.
-- **Scenes:** a scene stack for multiple UI levels (map → town → battle) with fade transitions
-  and results passed back down (`PopWith`).
-- **Save and load:** a world's map (layout, heights, materials by name, water, fog of war) round
-  trips through `HexWorld::to_bytes` / `load_bytes`, a compact self-contained blob for files,
-  browser storage or network messages.
-- **UI:** immediate-mode panels, buttons, bars, tooltips, wrapped text and images, with a
-  built-in pixel font.
-- **Input:** mouse, keyboard, touch (tap, drag, pinch), click-vs-drag detection and UI hit
-  testing, plus gamepads (gilrs natively, the Gamepad API on the web). By default the first pad
-  drives a virtual cursor, so every game is controller-playable: left stick = cursor,
-  A = click, B = right-click, right stick = pan, triggers or bumpers = zoom, Start = Enter,
-  Select = Escape.
-- **Audio:** a mixer with positional sound (panned and attenuated by screen position), looping
-  music and a UI click sound. Sounds come from WAV files or are synthesized at startup
-  (sfxr-style effects and a chiptune generator), so games need no audio files. Output uses cpal
-  natively and WebAudio in the browser, unlocked on the first click.
-- **Networking (`knight-net`, the engine's default `net` feature):** a compact binary codec, a
-  relay protocol with rooms, WebSocket transports for native and web, an in-process hub (tests,
-  hot seat, bots), and deterministic lockstep for turn-based or fixed-tick games. `apps/relay` is
-  a small WebSocket relay server. Offline games can turn the feature off.
+**World**
+- Hex grids: axial, cube, offset and doubled coordinates; pointy and flat layouts; rings,
+  spirals, lines, rotation and reflection; hexagon, rectangle, rhombus and triangle maps.
+- Terrain: per-hex height levels (hills and depressions), a water plane with visible submerged
+  ground, textured materials, stacked cliff walls, and animated water and lava.
+- Elevation-aware picking: rays hit tile tops and walls, so tall hexes hide the ones behind them.
+- Fog of war (hidden, explored, visible) that only rebuilds what changed.
+- Save and load a map to a compact byte blob with `HexWorld::to_bytes` / `load_bytes`.
 
-## Workspace
+**Gameplay**
+- A* with arbitrary step costs, budgeted movement ranges, flow fields for crowds, and
+  height-aware line of sight and field of view.
+- `HexMover` walks routes of adjacent hexes at the speed the terrain allows. `Reservations` let
+  real-time units queue instead of overlapping.
+- Turn modes: turn-based, real time, and hybrid timed days (`DayClock` + `ActionBudget`).
+- Closing-in hazards: a phased `ShrinkingZone` and a spreading `Wildfire` for battle royale modes.
+- A seeded RNG and value noise for procedural maps.
 
-```
-crates/knight-hex      hex math, pathfinding, vision, noise (no dependencies)
-crates/knight-core     worlds, camera, picking, meshing, frame/UI, scenes, input, assets (no GPU)
-crates/knight-assets   the bundled pixel-art pack (terrain, props, fire, characters, buildings)
-crates/knight-net      codec, relay protocol, WebSocket / in-process transports, lockstep
-crates/knight-engine   wgpu renderer, winit runtime, audio out, gamepads; re-exports everything
-apps/relay             WebSocket relay server for multiplayer (rooms)
-apps/sandbox           demo app (native + web); not part of the engine, games depend on knight-engine only
-scripts/web.sh         web build / serve
-```
+**Presentation**
+- A fixed-direction isometric camera: pan by drag, keys or screen edge; zoom at the cursor;
+  configurable viewing angle from 30° to top-down.
+- Depth-correct upright sprites with shadows, ground decals, overlays, territory borders,
+  hex-edge rivers and walls, world-anchored labels and bars.
+- Per-camera ambient light for day and night, particles for sparks, smoke and fire.
+- Several cameras per frame, gradient backdrops, and a one-image minimap for any map size.
+
+**Engine**
+- A scene stack for multiple UI levels, with fade transitions and results passed back down.
+- Immediate-mode UI: panels, buttons, bars, text fields, tooltips, wrapped text and images.
+- Input: mouse, keyboard, touch gestures and gamepads. The first pad drives a virtual cursor, so
+  every game is controller-playable out of the box.
+- Audio: a mixer with positional sound and looping music, from WAV files or synthesized at startup.
+- Networking: a binary codec, a relay protocol with rooms, WebSocket transports for native and
+  web, an in-process hub for tests and hot seat, and deterministic lockstep.
 
 ## Quick start
+
+Add `knight-engine` as a dependency, then:
 
 ```rust
 use knight_engine::*;
@@ -122,43 +120,85 @@ fn main() {
 }
 ```
 
-Run it with `cargo run -p knight-engine --example hello`.
+Run it with `cargo run -p knight-engine --example hello`. A game depends only on
+`knight-engine`, which re-exports the core, the hex math (as `hex`) and networking (as `net`,
+behind the default `net` feature).
 
-## Running the sandbox
+## The sandbox
 
-You need Rust from rustup; the toolchain file adds the `wasm32-unknown-unknown` target. For the
-web build you also need `wasm-bindgen-cli` 0.2.129.
+`apps/sandbox` is an interactive tour of the engine: 17 demos, each named after the features it
+shows. It is a separate app, not part of the engine, and nothing in the engine depends on it.
+
+| Key | Demo | Shows |
+| --- | --- | --- |
+| 1 | Terrain & Camera | Heights, water, map shapes, pointy/flat hexes, view angle, render modes |
+| 2 | Picking & Editing | Elevation-aware picking, sculpting and painting, map save/load |
+| 3 | Pathfinding | A* with terrain costs and climb limits, move ranges, flow fields |
+| 4 | Vision & Fog | Line of sight, field of view, fog of war with memory |
+| 5 | Overlays, Light & FX | Territory borders, hex-edge rivers, day/night, particles |
+| 6 | Scenes & UI Levels | Map → town → battle with results passed back |
+| 7, 8 | Turn-Based | One unit, and squads with box select and enemy turns |
+| 9, 0 | Realtime | One unit, and squads with hex reservations and pause |
+| H | Hybrid: Timed Days | Everyone acts at once within a daily budget |
+| B | Battle Royale | Free-for-all inside a shrinking ring of fire |
+| C | Chat & Emotes | Bubbles and emotes that stay readable in crowds |
+| O | Online Play | Relay rooms over WebSocket, or practice against a bot |
+| R | Routes & Transport | Survey routes, lay track, run vehicles along them |
+| S | Stress Test | Up to 840k hexes and 2,000 units pathing hex to hex |
+| A | Asset Pack | Every terrain, prop, character and building in the pack |
+
+`Esc` goes back, `P` toggles pixel-art rendering, `M` toggles music and `N` mutes. With a gamepad,
+move the cursor with the left stick and press A.
+
+<p align="center"><img src="docs/images/battle-royale.png" alt="The battle royale demo" width="49%"> <img src="docs/images/editor.png" alt="The map editor demo" width="49%"></p>
+
+### Running it
+
+You need Rust from [rustup](https://rustup.rs); the toolchain file adds the
+`wasm32-unknown-unknown` target. The web build also needs `wasm-bindgen-cli` 0.2.129
+(`cargo install wasm-bindgen-cli --version 0.2.129`).
 
 ```sh
 cargo run -p knight-sandbox --release   # native window
-scripts/web.sh serve                    # web: http://localhost:8080
-cargo run -p knight-relay --release     # relay for the Online Play demo (ws://localhost:9001)
-cargo test --workspace
-cargo run -p knight-core --example bench_terrain --release   # large-map benchmark
+scripts/web.sh serve                    # web build, then http://localhost:8080
+cargo run -p knight-relay --release     # relay for Online Play (ws://localhost:9001)
 ```
 
-The menu has 17 demos, each named after the features it shows:
-- Terrain & Camera, Picking & Editing, Pathfinding, Vision & Fog, and Overlays, Light & FX.
-- Scenes & UI Levels (map → town → battle).
-- Turn-Based: 1 Unit and Turn-Based: Squads.
-- Realtime: 1 Unit and Realtime: Squads.
-- Hybrid: Timed Days, Battle Royale, Chat & Emotes, Online Play (open two tabs, or practice with a bot), Routes & Transport, and a Stress Test (32k to 840k hexes with a minimap, and 2,000 units pathing hex to hex).
-- Asset Pack: every terrain, prop, character and building in the bundled pack, with animations,
-  building states and team colours.
+Add `?backend=webgl2` to the web URL to force the WebGL2 fallback.
 
-Press a demo's key to open it (shown on its card) and `Esc` to go back. `P` toggles pixel-art rendering, `M` music and `N` mute. With a gamepad, move the cursor with the left stick and press A.
+## Workspace
+
+| Crate | Purpose |
+| --- | --- |
+| `crates/knight-hex` | Hex math, pathfinding, vision and noise. No dependencies. |
+| `crates/knight-core` | Worlds, camera, picking, meshing, frame and UI, scenes, input, assets, audio. No GPU code, so it is fully unit-tested. |
+| `crates/knight-assets` | The bundled pixel-art pack, loaded and cached on demand. |
+| `crates/knight-net` | Codec, relay protocol, WebSocket and in-process transports, lockstep. |
+| `crates/knight-engine` | The wgpu renderer, winit runtime, audio output and gamepads. Re-exports everything a game needs. |
+| `apps/relay` | A small WebSocket relay server with rooms. |
+| `apps/sandbox` | The demo app, native and web. |
+
+## Development
+
+```sh
+cargo test --workspace                          # unit tests, including a headless battle sim
+cargo clippy --workspace --all-targets          # kept warning-free
+cargo fmt --all
+cargo run -p knight-core --example bench_terrain --release   # 128² to 2048² map benchmark
+```
+
+[AGENTS.md](AGENTS.md) describes the architecture, the key design decisions and how to verify
+changes in a real browser.
 
 ## Platforms
 
 | Target | Status |
 | --- | --- |
-| Web (WebGPU / WebGL2) | Built and verified in Chrome (both backends, DPR 1 and 2, phone viewport); `?backend=webgl2` forces the fallback |
+| Web (WebGPU / WebGL2) | Verified in Chrome on both backends, at DPR 1 to 3 and phone viewports |
 | macOS (Metal) | Runs natively |
-| Windows (DX12/Vulkan), Linux (Vulkan/GL) | Supported by wgpu + winit, not yet tested here |
-| iOS, Android | Supported by wgpu + winit; needs packaging (e.g. `cargo-mobile2`), not set up yet |
-| Steam | A native desktop build; Steamworks integration not included |
-| PlayStation, Xbox | Need NDA platform SDKs and custom wgpu/winit backends; out of scope for this repo |
+| Windows (DX12 / Vulkan), Linux (Vulkan / GL) | Supported by wgpu and winit, not yet tested |
+| iOS, Android | Supported by wgpu and winit; packaging is not set up yet |
+| Consoles | Need NDA platform SDKs; out of scope for this repository |
 
-Not implemented yet: NAT-traversing peer-to-peer (WebRTC/Steam) transports and
-server-authoritative rollback netcode. The relay plus lockstep cover turn-based, hybrid and
-fixed-tick games.
+Not implemented yet: NAT-traversing peer-to-peer transports (WebRTC, Steam) and rollback
+netcode. The relay plus lockstep cover turn-based, hybrid and fixed-tick games.
